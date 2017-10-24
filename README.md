@@ -15,26 +15,26 @@ We have 5 possible configurations, not counting any permutations:
 ## Nomenclature:
 * concentration a = c(A)
 * concentration b = c(B)
-* concentration ratio r = a / b (eq1)
-* total concentration a + b = 1 (eq2)
+* concentration ratio r = a / b ***(eq1)***
+* total concentration a + b = 1 ***(eq2)***
 
 
 ## Concentration in terms of *r*
+from ***(eq3)***
 ```
-from (eq1)
 a = r * b (eq3)
 b = a / r (e14)
 ```
 
+***(eq4)*** in ***(eq2)***
 ```
-(eq4) in (eq2)
 a + a/r = 1
 a (1 + 1/r) = 1
 a = 1 / (1 + 1/r)
 ```
 
+***(eq3)*** in ***(eq2)***
 ```
-(eq3) in (eq2)
 r * b + b = 1
 b (1 + r) = 1
 b = 1 / (1 / (1 + r))
@@ -43,11 +43,13 @@ b = 1 / (1 / (1 + r))
 
 ## Relative concentrations of configurations
 The stochastic composition of tetramers follows the mass action law:
+```
 aaaa = a * a * a * a
 aaai = a * a * a * i
 aaii = a * a * i * i
 aiii = a * i * i * i
 iiii = i * i * i * i
+```
 
 
 ## Two allostery models
