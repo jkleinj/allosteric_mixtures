@@ -9,12 +9,12 @@
 
 ## Configurations
 We have 5 possible configurations, not counting any permutations:
- AAAA, AAAI, AAII, AIII, IIII
+AAAA, AAAI, AAII, AIII, IIII
 
 
 ## Nomenclature:
 * concentration a = c(A)
-* concentration i = c(B)
+* concentration i = c(I)
 * concentration ratio r = a / i ***(eq1)***
 * total concentration a + i = C ***(eq2)***
 
@@ -63,5 +63,35 @@ C = aaaa + aaai + aaii + aiii + iiii;
   constant in all 5 possible configurations (see above).
 2. The allosteric effect is linked to the number of A (active) monomers
   and therefore linearly decreasing with the ratio *r*.
+
+
+## Enzymatic activity
+The key effect of the allosteric interaction is not the binding in this case
+(we assume fully formed tetramers), but the enzymatic activity.
+In this model we set the enzymatic activity propostional to the number of
+active monomers in the tetramer and the concentration of the tetramer:
+```
+aaaa_ea = 4/4 * aaaa
+aaai_ea = 3/4 * aaai
+aaii_ea = 2/4 * aaii
+aiii_ea = 1/4 * aiii
+iiii_ea = 0/4 * iiii
+```
+That yields a linear decrease of the enzymaic activity with increasing concentration
+of inactive monomers.
+
+The allosteric component of the model is added with the *allosteric coefficient (AC)*
+as an exponent, similar to the Hill coefficient:
+```
+AC = 4; # allostery coefficient
+aaaa_ea = (4/4)^AC;
+aaai_ea = (3/4)^AC;
+aaii_ea = (2/4);
+aiii_ea = (1/4);
+iiii_ea = (0/4);
+```
+The model shown here depicts already the behaviour seen in Jamie's data, where the
+allosteric effect disappears below an A/I ratio r = 0.5.
+
 
 
