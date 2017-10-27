@@ -1,0 +1,118 @@
+---
+title: "Allosteric Cooperativity in Tetramer Mixture"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+## Posits
+1. We consider a mixture of two components A (active) and I (inactive).
+2. The components form exclusively tetramers.
+3. The composition of tetramers is purely stochastic.
+4. The mixture is defined by the ratio of the concentrations of A and I.
+
+
+## Configurations
+We have 5 possible configurations, not counting any permutations:
+AAAA, AAAI, AAII, AIII, IIII
+
+
+## Nomenclature
+* concentration a = c(A)
+* concentration i = c(I)
+* concentration ratio *r*; ***[eq1]***
+```{r, eval = FALSE}
+r = a / i
+```
+* total concentration *C*; ***[eq2]***
+```{r, eval = FALSE}
+C = a + i
+```
+
+## Concentrations
+### Concentration in terms of *r*; ***[eq3]***
+```{r, eval = FALSE}
+r = 10; # in practice (below) a sequence from 0 to 10
+a = r * i;
+i = a / r;
+```
+
+### Concentration *a*; ***[eq4]*** in ***[eq2]***
+```{r, eval = FALSE}
+a + (a / r) = C;
+a (1 + (1 / r)) = C;
+a = C / (1 + (1 / r));
+```
+
+### Concentration *i*; ***[eq3]*** in ***[eq2]***
+```{r, eval = FALSE}
+r * i + i = C;
+i (1 + r) = C;
+i = C / (1 + r);
+```
+
+## Constants: Total concentration and allosteric coefficient
+```{r}
+C = 1;
+AC = 4;
+```
+
+## Models for enzymatic activities of tetramers
+
+1. Non-cooperative (linear) model
+```{r}
+aaaa_ea = aaai_ea = aaii_ea = aiii_ea = iiii_ea = 1;
+```
+2. Pair model: number of possible active pairs
+```{r}
+aaaa_ea = 3^AC;
+aaai_ea = 2^AC;
+aaii_ea = 1^AC;
+aiii_ea = (1/4);
+iiii_ea = (0/4);
+```
+
+3. Cooperative (non-linear) model
+```{r}
+aaaa_ea = (4/4)^AC;
+aaai_ea = (3/4)^AC;
+aaii_ea = (2/4);
+aiii_ea = (1/4);
+iiii_ea = (0/4);
+```
+
+## Evaluate enzmatic activity (ea) of the tetramer mixture for a range of A/I concentration ratios
+```{r}
+rs = seq(0.1, 10, by = 0.01);
+
+result.ea = lapply(rs, function(r) {
+    a = C / (1 + 1 / r);
+    i = C / (1 + r);
+    sum(a + i);
+
+    #_______________________________________________________________________________
+    ## tetramer concentrations
+    aaaa = a^4;
+    aaai = 4 * a^3 * i;
+    aaii = 6 * a^2 * i^2;
+    aiii = 4 * a * i^3;
+    iiii = i^4;
+    stopifnot(isTRUE(all.equal(sum(aaaa + aaai + aaii + aiii + iiii), 1)));
+
+    #_______________________________________________________________________________
+    ## total enzymatic activity of tetramer mixture
+    total_ea =  aaaa * aaaa_ea +
+                aaai * aaai_ea +
+                aaii * aaii_ea +
+                aiii * aiii_ea +
+                iiii * iiii_ea;
+
+    c(i, total_ea);
+});
+
+result.ea.df = do.call(rbind.data.frame, result.ea);
+colnames(result.ea.df) = c("i", "total_ea");
+plot(abs(result.ea.df[ ,1]), result.ea.df[ ,2], xlab = c("i"), ylab = c("enzymatic activity"));
+```
+
+

@@ -10,12 +10,23 @@ C = 1;
 
 ## enzymatic activities of tetramers
 AC = 4; # allostery coefficient
+
+## linear model
+#aaaa_ea = aaai_ea = aaii_ea = aiii_ea = iiii_ea = 1;
+
+## ad-hoc model
 aaaa_ea = (4/4)^AC;
 aaai_ea = (3/4)^AC;
 aaii_ea = (2/4);
 aiii_ea = (1/4);
 iiii_ea = (0/4);
-#aaaa_ea = aaai_ea = aaii_ea = aiii_ea = iiii_ea = 1;
+
+## pair model: number of possible active pairs
+#aaaa_ea = 3^AC;
+#aaai_ea = 2^AC;
+#aaii_ea = 1^AC;
+#aiii_ea = (1/4);
+#iiii_ea = (0/4);
 
 rs = seq(0.1, 10, by = 0.01);
 
