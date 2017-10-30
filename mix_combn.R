@@ -30,7 +30,7 @@ iiii_ea = (0/4);
 
 rs = seq(0.1, 10, by = 0.01);
 
-result.ea = lapply(rs, function(r) {
+eval.ea = lapply(rs, function(r) {
 	a = C / (1 + 1 / r);
 	i = C / (1 + r);
 	sum(a + i);
@@ -52,10 +52,17 @@ result.ea = lapply(rs, function(r) {
 				aiii * aiii_ea +
 				iiii * iiii_ea;
 
-	c(i, total_ea);
+	c(i, aaaa, aaai, aaii, aiii, iiii, total_ea);
 });
 
-result.ea.df = do.call(rbind.data.frame, result.ea);
-colnames(result.ea.df) = c("i", "total_ea");
-plot(abs(result.ea.df[ ,1]), result.ea.df[ ,2]);
+eval.ea.df = do.call(rbind.data.frame, eval.ea);
+colnames(eval.ea.df) = c("i", "aaaa", "aaai", "aaii", "aiii", "iiii", "total_ea");
+plot(abs(eval.ea.df[ ,1]), eval.ea.df[ ,2], col = "blue4",
+			xlim = c(0, 1), ylim = c(0, 1),
+			xlab = c("i"), ylab = ("concentration || EA"));
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,3], col = "blue1");
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,4], col = "grey");
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,5], col = "orange1");
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,6], col = "orange4");
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,7], col = "black");
 

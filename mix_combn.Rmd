@@ -1,8 +1,8 @@
 ---
 title: "Allosteric Cooperativity in Tetramer Mixture"
 output:
-  html_document: default
   html_notebook: default
+  html_document: default
 ---
 
 ## Posits
@@ -29,6 +29,7 @@ r = a / i
 C = a + i
 ```
 
+
 ## Concentrations
 ### Concentration in terms of *r*; ***[eq3]***
 ```{r, eval = FALSE}
@@ -51,41 +52,43 @@ i (1 + r) = C;
 i = C / (1 + r);
 ```
 
+
 ## Constants: Total concentration and allosteric coefficient
 ```{r}
 C = 1;
-AC = 4;
+AC = 2;
 ```
 
-## Models for enzymatic activities of tetramers
 
+## Models for enzymatic activities of tetramers
 1. Non-cooperative (linear) model
 ```{r}
 aaaa_ea = aaai_ea = aaii_ea = aiii_ea = iiii_ea = 1;
 ```
-2. Pair model: number of possible active pairs
-```{r}
-aaaa_ea = 3^AC;
-aaai_ea = 2^AC;
-aaii_ea = 1^AC;
-aiii_ea = (1/4);
-iiii_ea = (0/4);
-```
 
-3. Cooperative (non-linear) model
+2. Cooperative (non-linear) model; cooperativity proportional to number of active contact pairs
+#```{r}
+#aaaa_ea = (4/4)^(4/4*AC);
+#aaai_ea = (3/4)^(2/4*AC);
+#aaii_ea = (2/4)^(2/3 * 1/4*AC);
+#aiii_ea = (1/4);
+#iiii_ea = (0/4);
+#```
+
 ```{r}
 aaaa_ea = (4/4)^AC;
 aaai_ea = (3/4)^AC;
-aaii_ea = (2/4);
+aaii_ea = (2/4)^AC;
 aiii_ea = (1/4);
 iiii_ea = (0/4);
 ```
 
-## Evaluate enzmatic activity (ea) of the tetramer mixture for a range of A/I concentration ratios
+
+## Evaluate enzymatic activity (ea) of the tetramer mixture for a range of A/I concentration ratios
 ```{r}
 rs = seq(0.1, 10, by = 0.01);
 
-result.ea = lapply(rs, function(r) {
+eval.ea = lapply(rs, function(r) {
     a = C / (1 + 1 / r);
     i = C / (1 + r);
     sum(a + i);
@@ -107,12 +110,63 @@ result.ea = lapply(rs, function(r) {
                 aiii * aiii_ea +
                 iiii * iiii_ea;
 
-    c(i, total_ea);
+    c(i, aaaa, aaai, aaii, aiii, iiii, total_ea);
 });
 
-result.ea.df = do.call(rbind.data.frame, result.ea);
-colnames(result.ea.df) = c("i", "total_ea");
-plot(abs(result.ea.df[ ,1]), result.ea.df[ ,2], xlab = c("i"), ylab = c("enzymatic activity"));
+eval.ea.df = do.call(rbind.data.frame, eval.ea);
+colnames(eval.ea.df) = c("i", "aaaa", "aaai", "aaii", "aiii", "iiii", "total_ea");
+plot(abs(eval.ea.df[ ,1]), eval.ea.df[ ,2], col = "blue4",
+            xlim = c(0, 1), ylim = c(0, 1),
+            xlab = c("i"), ylab = ("concentration || EA"));
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,3], col = "blue1");
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,4], col = "grey");
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,5], col = "orange1");
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,6], col = "orange4");
+points(abs(eval.ea.df[ ,1]), eval.ea.df[ ,7], col = "black");
+```
+
+
+## Linear regression
+### Experimental Input data
+```{r}
+dat = read.table("processed_kinetic_data.tsv", header = TRUE);
+plot(abs(dat[ , 1]), dat[ , 15], xlab = c("i"), ylab = c("enzymatic activity"));
+```
+
+### Linear regression model
+The non-linearity in the model originates from the cooperativity exponent, a type of Hill coefficient.
+In contrast to allosteric models, we do not model binding events, merely the composition of the tetramers changes
+with increasing amount on inactive monomer. The non-linearity of the enzymatic activity can be modelled via an exponent
+(like a Hill coefficient).
+However, for linear regression we need an equation that is linear in the fit parameters.
+The solution is a log expression of the enzymatic activity (EA).
+The factors [4,3,2,1] inside the log function are the number of active monomers, which modulate the tetramer concentrations
+to the concentration of active monomers.
+```{r, eval = FALSE}
+log(EA) = AC * log(aaaa * 4) + AC * log(aaai * 3) + AC * log(aaii * 2) + AC * log(aiii * 1);
+```
+
+### Linear regression
+#### Compute concentrations of tetramers
+```{r}
+## aaaa
+dat = cbind(dat, (1 - (dat[ ,1]^4)));
+colnames(dat) = c(colnames(dat)[-length(colnames(dat))], "aaaa");
+## aaai
+dat = cbind(dat, (1 - (dat[ , 1]^3)) * (dat[ , 1]^1));
+colnames(dat) = c(colnames(dat)[-length(colnames(dat))], "aaai");
+## aaii
+dat = cbind(dat, (1 - (dat[ , 1]^2)) * (dat[ , 1]^2));
+colnames(dat) = c(colnames(dat)[-length(colnames(dat))], "aaii");
+## aiii
+dat = cbind(dat, (1 - (dat[ , 1]^1)) * (dat[ , 1]^3));
+colnames(dat) = c(colnames(dat)[-length(colnames(dat))], "aiii");
+```
+
+
+```{r}
+myLm = lm(log(dat[ ,15]) ~ log(dat[ ,1]));
+
 ```
 
 
