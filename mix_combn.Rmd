@@ -143,7 +143,7 @@ The solution is a log expression of the enzymatic activity (EA).
 The factors [4,3,2,1] inside the log function are the number of active monomers, which modulate the tetramer concentrations
 to the concentration of active monomers.
 ```{r, eval = FALSE}
-log(EA) = AC * log(aaaa * 4) + AC * log(aaai * 3) + AC * log(aaii * 2) + AC * log(aiii * 1);
+log(EA) = AC * log(4 * aaaa) + AC * log(3 * aaai) + AC * log(2 * aaii) + AC * log(1 * aiii);
 ```
 
 ### Linear regression
@@ -163,10 +163,10 @@ dat = cbind(dat, (1 - (dat[ , 1]^1)) * (dat[ , 1]^3));
 colnames(dat) = c(colnames(dat)[-length(colnames(dat))], "aiii");
 ```
 
-
+#### Run regression, AC is the fit parameter
 ```{r}
-myLm = lm(log(dat[ ,15]) ~ log(dat[ ,1]));
-
+#myLm = lm(log(dat[ ,15]) ~ log(4 * dat[ , "aaaa"]) + log(3 * dat[ , "aaai"]) + log(2 * dat[ , "aaii"]) + log(1 * dat[ , "aiii"]));
+myLm = lm(log(dat[ ,15]) ~ log(4 * dat[ , "aaaa"]));
 ```
 
 
